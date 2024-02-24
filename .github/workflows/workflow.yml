@@ -1,4 +1,4 @@
-name: CI Tiu Lanches
+name: CI Tiu Lanches Auth Function
 
 on:
   pull_request:
