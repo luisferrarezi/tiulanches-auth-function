@@ -15,10 +15,14 @@ public class Authorization {
     @Getter
     private int login;
 
+    @Getter
+    private String accessToken;
+
     public Authorization getAuthorization(HttpRequestMessage<Optional<String>>req) {
         Map<String, String> headers = req.getHeaders();
-        this.email = headers.get("email");
-        this.login = Integer.parseInt(headers.get("login"));
+        //this.email = headers.get("email");
+        //this.login = Integer.parseInt(headers.get("login"));
+        this.accessToken = headers.get("authorization");
         return this;
     }  
 }
