@@ -8,7 +8,12 @@ import com.microsoft.azure.functions.HttpStatus;
 import com.microsoft.azure.functions.annotation.AuthorizationLevel;
 import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
+import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -29,7 +34,39 @@ public class Function {
         Authorization auth = new Authorization();
         auth.getAuthorization(request);
 
-        String updateQuery = "UPDATE clientes SET LOGADO = ? WHERE email = ?";
+        try {
+            URL url = new URL("https://graph.microsoft.com/v1.0/me");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", auth.getAccessToken());
+            conn.setRequestProperty("Accept","application/json");
+
+            StringBuilder response;            
+            int httpResponseCode = conn.getResponseCode();
+
+            try(BufferedReader in = new BufferedReader(
+                new InputStreamReader(conn.getInputStream()))){
+
+                String inputLine;
+                response = new StringBuilder();
+                while (( inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+            }                            
+
+            if(httpResponseCode == HTTPResponse.SC_OK) {
+                return request.createResponseBuilder(HttpStatus.OK).body(response.toString()).build();
+            } else if(httpResponseCode == HTTPResponse.SC_UNAUTHORIZED) {                
+                return request.createResponseBuilder(HttpStatus.UNAUTHORIZED).body(response.toString()).build();
+            } else {
+                return request.createResponseBuilder(HttpStatus.BAD_REQUEST).body(response.toString()).build();
+            }   
+        } catch (Exception e) {
+            return request.createResponseBuilder(HttpStatus.FORBIDDEN).body(e.getMessage()).build();
+        }        
+
+        /*String updateQuery = "UPDATE clientes SET LOGADO = ? WHERE email = ?";
         String connString = criaConnString();
         
         try (Connection connection = DriverManager.getConnection(connString);                
@@ -43,7 +80,7 @@ public class Function {
         } catch (SQLException ex) {
             context.getLogger().severe("Erro de conexão com a base: " + ex.getMessage());
             return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        }*/
     }
 
     private String criaConnString(){
