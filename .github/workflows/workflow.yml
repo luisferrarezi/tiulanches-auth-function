@@ -27,8 +27,6 @@ jobs:
       with:
         java-version: ${{ env.JAVA_VERSION }}
         distribution: 'temurin'
-        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: Build with Maven
       run: mvn clean package
@@ -42,11 +40,14 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: ${{ env.JAVA_VERSION }}
-        distribution: 'temurin'        
+        distribution: 'temurin'
 
     - name: 'Restore Project Dependencies Using Mvn'
       shell: bash
       run: |
+        export DATASOURCE_PASSWORD="${{ env.DATASOURCE_PASSWORD }}"
+        export DATASOURCE_URL="${{ env.DATASOURCE_URL }}"
+        export DATASOURCE_USERNAME="${{ env.DATASOURCE_USERNAME }}"
         pushd './${{ env.POM_XML_DIRECTORY }}'
         mvn clean package
         popd        
