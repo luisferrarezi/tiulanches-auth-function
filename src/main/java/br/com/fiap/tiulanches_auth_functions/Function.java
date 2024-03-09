@@ -72,7 +72,7 @@ public class Function {
             }           
         } catch (Exception e) {
             if ((e instanceof SQLException) || (e instanceof JsonProcessingException) || (e instanceof JsonMappingException)) {
-                return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).body("Falha ao registrar login cliente!").build();
+                return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()).build();
             } else {
                 return request.createResponseBuilder(HttpStatus.FORBIDDEN).body(e.getMessage()).build();
             }
