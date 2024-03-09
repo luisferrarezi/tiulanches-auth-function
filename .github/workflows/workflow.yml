@@ -42,9 +42,13 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: ${{ env.JAVA_VERSION }}
-        distribution: 'temurin'
-        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
+
+    - name: 'Restore Project Dependencies Using Mvn'
+      shell: bash
+      run: |
+        pushd './${{ env.POM_XML_DIRECTORY }}'
+        mvn clean package
+        popd        
     
     - name: Azure Functions Action
       uses: Azure/functions-action@v1
