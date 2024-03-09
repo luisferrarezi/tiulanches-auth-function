@@ -7,7 +7,11 @@ on:
 env:
   AZURE_FUNCTIONAPP_NAME: 'tiulanches-auth-function'
   POM_XML_DIRECTORY: '.'    
-  JAVA_VERSION: '17'        
+  JAVA_VERSION: '17'
+  AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+  DATASOURCE_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
+  DATASOURCE_URL: ${{ secrets.DATASOURCE_URL }}
+  DATASOURCE_USERNAME: ${{ secrets.DATASOURCE_USERNAME }}
     
 jobs:
   build:
@@ -48,6 +52,6 @@ jobs:
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
         package: '${{ env.POM_XML_DIRECTORY }}' 
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+        publish-profile: ${{ env.AZURE_CREDENTIALS }}
         respect-pom-xml: true
         
