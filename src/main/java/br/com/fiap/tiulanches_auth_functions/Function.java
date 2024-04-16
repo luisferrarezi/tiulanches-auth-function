@@ -1,7 +1,6 @@
 package br.com.fiap.tiulanches_auth_functions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.microsoft.azure.functions.ExecutionContext;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
@@ -17,6 +16,7 @@ import br.com.fiap.tiulanches_auth_functions.authentication.LoginCliente;
 import br.com.fiap.tiulanches_auth_functions.repository.DB;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -48,15 +48,15 @@ public class Function {
             StringBuilder response;            
             int httpResponseCode = conn.getResponseCode();
 
-            try(BufferedReader in = new BufferedReader(
-                new InputStreamReader(conn.getInputStream()))){
+            InputStream is = conn.getInputStream();
 
-                String inputLine;
-                response = new StringBuilder();
-                while (( inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-            }                            
+            BufferedReader in = new BufferedReader(new InputStreamReader(is));
+
+            String inputLine;
+            response = new StringBuilder();
+            while (( inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }            
 
             if(httpResponseCode == HTTPResponse.SC_OK) {
                 LoginCliente loginCliente = auth.getLoginCliente(response.toString());
@@ -68,14 +68,12 @@ public class Function {
             } else if(httpResponseCode == HTTPResponse.SC_UNAUTHORIZED) {                
                 return request.createResponseBuilder(HttpStatus.UNAUTHORIZED).body(response.toString()).build();
             } else {
-                return request.createResponseBuilder(HttpStatus.BAD_REQUEST).body(response.toString()).build();
+                return request.createResponseBuilder(HttpStatus.BAD_REQUEST).body(response.toString()).build();        
             }           
+        } catch (SQLException | JsonProcessingException e) {
+            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()).build();            
         } catch (Exception e) {
-            if ((e instanceof SQLException) || (e instanceof JsonProcessingException) || (e instanceof JsonMappingException)) {
-                return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()).build();
-            } else {
-                return request.createResponseBuilder(HttpStatus.FORBIDDEN).body(e.getMessage()).build();
-            }
+            return request.createResponseBuilder(HttpStatus.FORBIDDEN).body(e.getMessage()).build();
         }
     }
 }
