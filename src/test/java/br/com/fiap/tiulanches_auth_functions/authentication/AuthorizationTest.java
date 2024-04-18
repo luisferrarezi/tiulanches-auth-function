@@ -20,7 +20,7 @@ class AuthorizationTest {
     private static final String RESPONSE = "{\"mail\":\"teste@gmail.com\",\"displayName\":\"teste\",\"nome\":\"testedenovo\"}";
 
     @BeforeEach
-    void BeforeEach(){
+    void beforeEach(){
         this.authorization = new Authorization();
     }
 
