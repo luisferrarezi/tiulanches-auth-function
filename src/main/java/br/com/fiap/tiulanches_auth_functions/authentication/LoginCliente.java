@@ -10,6 +10,6 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LoginCliente {
     
-    String mail;
-    String displayName;
+    private String mail;
+    private String displayName;
 }

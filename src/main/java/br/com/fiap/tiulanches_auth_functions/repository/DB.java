@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 public class DB {
     public void informaClienteAutenticado(String email) throws SQLException {
-        String updateQuery = "UPDATE clientes SET LOGADO = ? WHERE email = ?";
+        String updateQuery = "UPDATE tlpedidos.clientes SET LOGADO = ? WHERE email = ?";
         String connString = criaConnString();
         
         Connection connection = DriverManager.getConnection(connString);                
